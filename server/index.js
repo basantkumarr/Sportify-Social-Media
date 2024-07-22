@@ -36,12 +36,9 @@ app.use('/images', express.static(path.join(__dirname, 'public/images')));
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
 
-if (!MONGO_URI) {
-  console.error("MongoDB URI is not defined. Check your environment variables.");
-  process.exit(1); // Exit process with failure
-}
+ 
 
-mongoose.connect(MONGO_URI, {
+mongoose.connect("mongodb+srv://basantkumarweb:mohitubba@app.x7kjcrd.mongodb.net/?retryWrites=true&w=majority&appName=app", {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
