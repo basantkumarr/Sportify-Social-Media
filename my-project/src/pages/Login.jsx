@@ -7,6 +7,7 @@ import toast from "react-hot-toast";
 import { useDispatch } from "react-redux";
 import { getUser } from "../redux/UserSlice";
 import { ClipLoader } from "react-spinners";
+
 const Login = () => {
   const [isLogin, setIsLogin] = useState(true);
   const [name, setName] = useState("");
@@ -17,16 +18,20 @@ const Login = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
+
   const submitHandler = useCallback(async (e) => {
     e.preventDefault();
     setError(""); // Clear any previous errors
     setLoading(true);
+
     try {
       const endpoint = isLogin ? "login" : "register";
       const payload = isLogin ? { email, password } : { name, username, email, password };
       const headers = { "Content-Type": "application/json" };
       const options = { headers, withCredentials: true };
+
       const res = await axios.post(`${USER_API_END_POINT}/${endpoint}`, payload, options);
+
       if (res.data.success) {
         if (isLogin) {
           dispatch(getUser(res.data.user));
@@ -37,27 +42,37 @@ const Login = () => {
           toast.success(res.data.message);
         }
       } else {
-        setError(res.data.message);
+        setError(res.data.message || 'An error occurred. Please try again.');
       }
     } catch (err) {
       console.error(err);
-	@@ -64,19 +64,15 @@ const Login = () => {
+      setError(err.response?.data?.message || `${isLogin ? "Login" : "Signup"} failed. Please try again.`);
+    } finally {
+      setLoading(false);
+    }
+  }, [email, password, name, username, isLogin, dispatch, navigate]);
+
+  const loginSignupHandler = () => {
+    setIsLogin(!isLogin);
+    setError(""); // Clear error message when switching forms
+  };
+
+  return (
+    <div className="w-screen h-screen flex items-center justify-center relative">
+      {loading && (
+        <div className="absolute inset-0 bg-white bg-opacity-70 flex items-center justify-center z-50">
           <ClipLoader size={50} color={"#1D9BF0"} />
         </div>
       )}
-      <div className="flex items-center justify-evenly w-[80%]">
-        <div>
-          <img className="j" width={"300px"} src={img} alt="logo" />
-        </div>
-        <div>
-          <div className="my-5">
-            <h1 className="font-bold text-gray-800 text-6xl">Happening now.</h1>
-          </div>
+      <div className="flex flex-col items-center justify-center w-[80%] sm:w-[100%]">
+        <img className="mb-4" width={"300px"} src={img} alt="logo" />
+        <div className="text-center">
+          <h1 className="text-gray-800 text-6xl font-bold">Happening now.</h1>
           <h1 className="mt-4 mb-2 text-2xl font-bold">
             {isLogin ? "Login" : "Signup"}
           </h1>
           {error && <p className="text-red-500">{error}</p>}
-          <form onSubmit={submitHandler} className="flex flex-col w-[55%]">
+          <form onSubmit={submitHandler} className="flex flex-col w-full max-w-md mx-auto">
             {!isLogin && (
               <>
                 <input
@@ -108,4 +123,5 @@ const Login = () => {
     </div>
   );
 };
+
 export default Login;
