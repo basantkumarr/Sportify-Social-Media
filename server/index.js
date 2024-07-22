@@ -36,6 +36,11 @@ app.use('/images', express.static(path.join(__dirname, 'public/images')));
 const MONGO_URI = process.env.MONGO_URI;
 const PORT = process.env.PORT || 3000;
 
+if (!MONGO_URI) {
+  console.error("MongoDB URI is not defined. Check your environment variables.");
+  process.exit(1); // Exit process with failure
+}
+
 mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
@@ -53,7 +58,10 @@ app.use('/post', postRoutes);
 // Error handling middleware
 app.use((err, req, res, next) => {
   console.error('Error details:', err);
-  res.status(err.status || 500).json({ error: 'Something went wrong!', details: err.message });
+  res.status(err.status || 500).json({
+    error: 'Something went wrong!',
+    details: err.message,
+  });
 });
 
 // Create an HTTP server and set timeout
