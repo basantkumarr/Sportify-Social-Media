@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 
-// Hard-code your secret key here
-const TOKEN_SECRET = 'kmswqmmwqwmjwmwxew';
+
 
 const isAuthenticated = async (req, res, next) => {
   try {
@@ -16,6 +15,9 @@ const isAuthenticated = async (req, res, next) => {
       });
     }
 
+
+    // Hard-code your secret key here
+const TOKEN_SECRET = 'kmswqmmwqwmjwmwxew';
     // Verify the token using the hard-coded secret key
     const decode = jwt.verify(token, TOKEN_SECRET);
 
