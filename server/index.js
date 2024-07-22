@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import mongoose from 'ongoose';
+import mongoose from 'mongoose'; // Corrected typo: 'mongoose' instead of 'mongoose'
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRoutes from './Routes/userRoute.js';
@@ -20,15 +20,15 @@ const allowedOrigins = [
 ];
 
 const corsOptions = {
-  origin: function (origin, callback) {
+  origin: (origin, callback) => {
     if (!origin) return callback(null, true); // Allow non-origin requests like from Postman or curl
-    if (allowedOrigins.indexOf(origin) === -1) {
-      const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-      return callback(new Error(msg), false);
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
     }
-    return callback(null, true);
+    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
+    return callback(new Error(msg), false);
   },
-  methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+  methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
   exposedHeaders: ['Access-Control-Allow-Credentials']
@@ -51,12 +51,12 @@ mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
- .then(() => console.log('MongoDB connected...'))
- .catch(err => console.error('MongoDB connection error:', err.message));
+  .then(() => console.log('MongoDB connected...'))
+  .catch((err) => console.error('MongoDB connection error:', err.message));
 
 // Route handlers
-app.use("/user", userRoutes);
-app.use("/post", postRoutes);
+app.use('/user', userRoutes);
+app.use('/post', postRoutes);
 
 // Error handling middleware
 app.use((err, req, res, next) => {
