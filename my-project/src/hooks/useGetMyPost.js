@@ -13,8 +13,14 @@ const useGetMyPost = (id) => {
       if (!id) {
         throw new Error('Invalid ID');
       }
+      const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
+      console.log('Token:', token);
+
       const res = await axios.get(`${POST_API_END_POINT}/allposts/${id}`, {
         withCredentials: true,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       console.log('Response from server:', res);
       if (res.data.success) {
@@ -32,8 +38,15 @@ const useGetMyPost = (id) => {
       if (!id) {
         throw new Error('Invalid ID');
       }
+      const token = document.cookie.split('; ').find(row => row.startsWith('token=')).split('=')[1];
+      console.log('Token:', token);
+
+      axios.defaults.withCredentials = true;
       const res = await axios.get(`${POST_API_END_POINT}/followingposts/${id}`, {
         withCredentials: true,
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
       });
       console.log('Response from server:', res);
       if (res.data.success) {
@@ -53,7 +66,6 @@ const useGetMyPost = (id) => {
       followingTweetHandler();
     }
   }, [isActive, refresh, id]); // Ensure 'id' is included in dependencies
-
 };
 
 export default useGetMyPost;
