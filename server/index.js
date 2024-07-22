@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose'; // Corrected typo: 'mongoose' instead of 'mongoose'
+import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRoutes from './Routes/userRoute.js';
@@ -14,20 +14,8 @@ app.use(express.json());
 app.use(cookieParser());
 
 // CORS Configuration
-const allowedOrigins = [
-  'https://sportify-chi.vercel.app',
-  'https://sportify-e09enzdaf-basants-projects-54b8f0df.vercel.app'
-];
-
 const corsOptions = {
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true); // Allow non-origin requests like from Postman or curl
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    const msg = 'The CORS policy for this site does not allow access from the specified Origin.';
-    return callback(new Error(msg), false);
-  },
+  origin: ['https://sportify-chi.vercel.app', 'https://sportify-e09enzdaf-basants-projects-54b8f0df.vercel.app'],
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -52,7 +40,7 @@ mongoose.connect(MONGO_URI, {
   useUnifiedTopology: true
 })
   .then(() => console.log('MongoDB connected...'))
-  .catch((err) => console.error('MongoDB connection error:', err.message));
+  .catch(err => console.error('MongoDB connection error:', err.message));
 
 // Route handlers
 app.use('/user', userRoutes);
