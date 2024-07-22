@@ -28,7 +28,9 @@ const Login = () => {
       const endpoint = isLogin ? "login" : "register";
       const payload = isLogin ? { email, password } : { name, username, email, password };
       const headers = { "Content-Type": "application/json" };
-      const options = { headers, withCredentials: true };
+      const options = { headers, withCredentials: true, timeout: 15000 }; // Set timeout to 10 seconds
+
+      console.log("Requesting:", `${USER_API_END_POINT}/${endpoint}`, payload); // Log request details
 
       const res = await axios.post(`${USER_API_END_POINT}/${endpoint}`, payload, options);
 
@@ -45,7 +47,7 @@ const Login = () => {
         setError(res.data.message || 'An error occurred. Please try again.');
       }
     } catch (err) {
-      console.error(err);
+      console.error("Axios error:", err); // Log the error details
       setError(err.response?.data?.message || `${isLogin ? "Login" : "Signup"} failed. Please try again.`);
     } finally {
       setLoading(false);
@@ -56,6 +58,7 @@ const Login = () => {
     setIsLogin(!isLogin);
     setError(""); // Clear error message when switching forms
   };
+
   return (
     <div className="w-screen h-screen flex items-center justify-center relative">
       {loading && (
