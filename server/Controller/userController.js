@@ -1,5 +1,6 @@
-import { User } from "../models/UserSchema.js";
+import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { User } from "../models/UserSchema.js";
 
 // Register endpoint
 export const Register = async (req, res) => {
@@ -20,11 +21,13 @@ export const Register = async (req, res) => {
       });
     }
 
+    // Hash the password before saving
+    const hashPassword = await bcryptjs.hash(password, 12);
     await User.create({
       name,
       username,
       email,
-      password, // Plain text password (not recommended for production)
+      password: hashPassword,
     });
 
     return res.status(201).json({
@@ -59,19 +62,17 @@ export const Login = async (req, res) => {
       });
     }
 
-    if (user.password !== password) { // Plain text password comparison (not recommended for production)
+    // Compare the hashed password with the provided password
+    const isMatch = await bcryptjs.compare(password, user.password);
+    if (!isMatch) {
       return res.status(401).json({
         message: "Incorrect email or password",
         success: false,
       });
     }
 
-    const tokenData = {
-      userId: user._id,
-    };
-    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET, {
-      expiresIn: "1d",
-    });
+    const tokenData = { userId: user._id };
+    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET, { expiresIn: "1d" });
 
     return res
       .status(200)
@@ -92,7 +93,6 @@ export const Login = async (req, res) => {
     });
   }
 };
-
 
 export const logout = (req, res) => {
   res.cookie("token", "", {
