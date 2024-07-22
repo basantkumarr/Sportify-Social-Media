@@ -1,6 +1,6 @@
-export const USER_API_END_POINT="http://localhost:8000/user"
+export const USER_API_END_POINT="https://sportify-social-media-api.vercel.app/user"
 
-export const POST_API_END_POINT="http://localhost:8000/post"
+export const POST_API_END_POINT="https://sportify-social-media-api.vercel.app/post"
 
 export const timeSince = (timestamp) => {
     let time = Date.parse(timestamp);
