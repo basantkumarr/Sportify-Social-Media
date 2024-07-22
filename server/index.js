@@ -11,6 +11,7 @@ dotenv.config();
 
 const app = express();
 app.use(express.json());
+app.use(cookieParser());
 
 const allowedOrigins = [
   'https://sportify-chi.vercel.app',
