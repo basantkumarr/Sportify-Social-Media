@@ -42,7 +42,7 @@ const Login = () => {
           toast.success(res.data.message);
         }
       } else {
-        setError(res.data.message);
+        setError(res.data.message || 'An error occurred. Please try again.');
       }
     } catch (err) {
       console.error(err);
@@ -64,19 +64,15 @@ const Login = () => {
           <ClipLoader size={50} color={"#1D9BF0"} />
         </div>
       )}
-      <div className="flex items-center justify-evenly w-[80%]">
-        <div>
-          <img className="j" width={"300px"} src={img} alt="logo" />
-        </div>
-        <div>
-          <div className="my-5">
-            <h1 className="font-bold text-gray-800 text-6xl">Happening now.</h1>
-          </div>
+      <div className="flex flex-col items-center justify-center w-[80%] sm:w-[100%]">
+        <img className="mb-4" width={"300px"} src={img} alt="logo" />
+        <div className="text-center">
+          <h1 className="text-gray-800 text-6xl font-bold">Happening now.</h1>
           <h1 className="mt-4 mb-2 text-2xl font-bold">
             {isLogin ? "Login" : "Signup"}
           </h1>
           {error && <p className="text-red-500">{error}</p>}
-          <form onSubmit={submitHandler} className="flex flex-col w-[55%]">
+          <form onSubmit={submitHandler} className="flex flex-col w-full max-w-md mx-auto">
             {!isLogin && (
               <>
                 <input
