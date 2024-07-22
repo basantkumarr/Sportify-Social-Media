@@ -1,4 +1,3 @@
-import bcryptjs from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { User } from "../models/UserSchema.js";
 
@@ -21,13 +20,12 @@ export const Register = async (req, res) => {
       });
     }
 
-    // Hash the password before saving
-    const hashPassword = await bcryptjs.hash(password, 12);
+    // Store plain text password (not recommended for production)
     await User.create({
       name,
       username,
       email,
-      password: hashPassword,
+      password,
     });
 
     return res.status(201).json({
@@ -62,9 +60,8 @@ export const Login = async (req, res) => {
       });
     }
 
-    // Compare the hashed password with the provided password
-    const isMatch = await bcryptjs.compare(password, user.password);
-    if (!isMatch) {
+    // Compare plain text password (not recommended for production)
+    if (user.password !== password) {
       return res.status(401).json({
         message: "Incorrect email or password",
         success: false,
