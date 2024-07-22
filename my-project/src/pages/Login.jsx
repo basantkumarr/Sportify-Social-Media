@@ -56,7 +56,6 @@ const Login = () => {
     setIsLogin(!isLogin);
     setError(""); // Clear error message when switching forms
   };
-
   return (
     <div className="w-screen h-screen flex items-center justify-center relative">
       {loading && (
