@@ -1,68 +1,38 @@
 import { User } from "../models/UserSchema.js";
-import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 // Register endpoint
 export const Register = async (req, res) => {
   try {
     const { name, username, email, password } = req.body;
-
-    // Validate input
     if (!name || !username || !email || !password) {
       return res.status(400).json({
-        message: "Please fill all the fields.",
+        message: "Please fill all the fields",
         success: false,
       });
     }
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email }).exec();
-
-    if (existingUser) {
+    const user = await User.findOne({ email });
+    if (user) {
       return res.status(400).json({
-        message: "User already exists.",
+        message: "User already exists",
         success: false,
       });
     }
 
-    // Hash password
-    const hashedPassword = await bcrypt.hash(password, 12); // Reduced salt rounds for slightly better performance
-
-    // Create new user
-    const newUser = new User({
+    await User.create({
       name,
       username,
       email,
-      password: hashedPassword,
+      password, // Plain text password (not recommended for production)
     });
 
-    await newUser.save();
-
-    // Generate JWT token
-    const token = jwt.sign({ userId: newUser._id }, process.env.TOKEN_SECRET, {
-      expiresIn: "1d",
+    return res.status(201).json({
+      message: "User created successfully",
+      success: true,
     });
-
-    // Send response with cookie
-    return res
-      .status(201)
-      .cookie("token", token, {
-        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
-        httpOnly: true,
-        sameSite: 'Strict', // Added security measure
-      })
-      .json({
-        message: "User registered successfully.",
-        user: {
-          _id: newUser._id,
-          name: newUser.name,
-          username: newUser.username,
-          email: newUser.email,
-        },
-        success: true,
-      });
-  } catch (error) {
-    console.error("Registration error:", error); // More specific error logging
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({
       message: "Server error",
       success: false,
@@ -70,12 +40,10 @@ export const Register = async (req, res) => {
   }
 };
 
-
+// Login endpoint
 export const Login = async (req, res) => {
   try {
     const { email, password } = req.body;
-
-    // Validate input
     if (!email || !password) {
       return res.status(400).json({
         message: "All fields are required.",
@@ -83,10 +51,7 @@ export const Login = async (req, res) => {
       });
     }
 
-    // Fetch user
-    const user = await User.findOne({ email }).exec();
-
-    // Check if user exists
+    const user = await User.findOne({ email });
     if (!user) {
       return res.status(401).json({
         message: "Incorrect email or password",
@@ -94,48 +59,40 @@ export const Login = async (req, res) => {
       });
     }
 
-    // Compare passwords
-    const isMatch = await bcrypt.compare(password, user.password);
-
-    // Validate password match
-    if (!isMatch) {
+    if (user.password !== password) { // Plain text password comparison (not recommended for production)
       return res.status(401).json({
         message: "Incorrect email or password",
         success: false,
       });
     }
 
-    // Generate JWT token
-    const token = jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET, {
+    const tokenData = {
+      userId: user._id,
+    };
+    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET, {
       expiresIn: "1d",
     });
 
-    // Send response with cookie
     return res
       .status(200)
       .cookie("token", token, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
         httpOnly: true,
-        sameSite: 'Strict', // Added security measure
       })
       .json({
         message: `Welcome back ${user.name}`,
-        user: {
-          _id: user._id,
-          name: user.name,
-          username: user.username,
-          email: user.email,
-        },
+        user,
         success: true,
       });
   } catch (error) {
-    console.error("Login error:", error); // More specific error logging
+    console.log(error);
     return res.status(500).json({
       message: "Server error",
       success: false,
     });
   }
 };
+
 
 export const logout = (req, res) => {
   res.cookie("token", "", {
