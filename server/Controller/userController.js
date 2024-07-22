@@ -42,6 +42,9 @@ export const Register = async (req, res) => {
 };
 
  
+import { User } from "../models/UserSchema.js";
+import jwt from "jsonwebtoken";
+
 // Login endpoint
 export const Login = async (req, res) => {
   try {
@@ -72,9 +75,19 @@ export const Login = async (req, res) => {
       });
     }
 
+    // Check TOKEN_SECRET
+    const tokenSecret = process.env.TOKEN_SECRET;
+    if (!tokenSecret) {
+      console.error('Token secret is not defined');
+      return res.status(500).json({
+        message: "Server configuration error: Token secret is not defined.",
+        success: false,
+      });
+    }
+
     // Create JWT token
     const tokenData = { userId: user._id };
-    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET, { 
+    const token = jwt.sign(tokenData, tokenSecret, { 
       expiresIn: "1d" // Token expiration time
     });
 
@@ -97,10 +110,11 @@ export const Login = async (req, res) => {
         success: true,
       });
   } catch (error) {
-    console.error('Login error:', error); // Use console.error for errors
+    console.error('Login error:', error); // Log the error for debugging
     return res.status(500).json({
       message: "Server error",
       success: false,
+      error: error.message // Return the error message in the response for debugging
     });
   }
 };
