@@ -19,12 +19,13 @@ const corsOptions = {
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Access-Control-Allow-Credentials'],
-  maxAge: 3600, // 1 hour
-  preflightContinue: false,
+  exposedHeaders: ['Access-Control-Allow-Credentials']
 };
 
 app.use(cors(corsOptions));
+
+// Middleware to handle preflight requests for all routes
+app.options('*', cors(corsOptions));
 
 // Static files setup
 const __dirname = path.resolve();
@@ -54,3 +55,6 @@ app.use((err, req, res, next) => {
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
+
+// Setting a higher timeout for the server
+app.timeout = 60000; // 60 seconds
