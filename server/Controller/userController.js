@@ -74,14 +74,8 @@ export const Login = async (req, res) => {
     }
 
     // Check TOKEN_SECRET
-    const tokenSecret = process.env.TOKEN_SECRET;
-    if (!tokenSecret) {
-      console.error('Token secret is not defined');
-      return res.status(500).json({
-        message: "Server configuration error: Token secret is not defined.",
-        success: false,
-      });
-    }
+    const tokenSecret = 'kmswqmmwqwmjwmwxew';
+  
 
     // Create JWT token
     const tokenData = { userId: user._id };
