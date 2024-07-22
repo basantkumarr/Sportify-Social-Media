@@ -27,12 +27,6 @@ app.use(cors(corsOptions));
 // Middleware to handle preflight requests for all routes
 app.options('*', cors(corsOptions));
 
-// Middleware to log request headers for debugging
-app.use((req, res, next) => {
-  console.log('Request Headers:', req.headers);
-  next();
-});
-
 // Static files setup
 const __dirname = path.resolve();
 app.use('/images', express.static(path.join(__dirname, 'public/images')));
