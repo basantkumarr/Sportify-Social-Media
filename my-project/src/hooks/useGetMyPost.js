@@ -10,28 +10,39 @@ const useGetMyPost = (id) => {
 
   const fetchMyPost = async () => {
     try {
+      if (!id) {
+        throw new Error('Invalid ID');
+      }
       const res = await axios.get(`${POST_API_END_POINT}/allposts/${id}`, {
         withCredentials: true,
       });
-      console.log('Response from server:', res); // Log the entire response object
+      console.log('Response from server:', res);
       if (res.data.success) {
         dispatch(getAllPost(res.data.posts));
       } else {
         console.error('Failed to fetch posts:', res.data.message);
       }
     } catch (error) {
-      console.error('Error fetching posts:', error); // Log the error for debugging
+      console.error('Error fetching posts:', error);
     }
   };
 
   const followingTweetHandler = async () => {
     try {
-      axios.defaults.withCredentials = true;
-      const res = await axios.get(`${POST_API_END_POINT}/followingposts/${id}`);
-      console.log(res);
-      dispatch(getAllPost(res.data.posts));
+      if (!id) {
+        throw new Error('Invalid ID');
+      }
+      const res = await axios.get(`${POST_API_END_POINT}/followingposts/${id}`, {
+        withCredentials: true,
+      });
+      console.log('Response from server:', res);
+      if (res.data.success) {
+        dispatch(getAllPost(res.data.posts));
+      } else {
+        console.error('Failed to fetch following posts:', res.data.message);
+      }
     } catch (error) {
-      console.log(error);
+      console.error('Error fetching following posts:', error);
     }
   };
 
@@ -41,7 +52,8 @@ const useGetMyPost = (id) => {
     } else {
       followingTweetHandler();
     }
-  }, [isActive, refresh]);
+  }, [isActive, refresh, id]); // Ensure 'id' is included in dependencies
+
 };
 
 export default useGetMyPost;
