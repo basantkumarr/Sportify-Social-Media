@@ -19,13 +19,12 @@ const corsOptions = {
   methods: ['GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'],
   credentials: true,
   allowedHeaders: ['Content-Type', 'Authorization'],
-  exposedHeaders: ['Access-Control-Allow-Credentials']
+  exposedHeaders: ['Access-Control-Allow-Credentials'],
+  maxAge: 3600, // 1 hour
+  preflightContinue: false,
 };
 
 app.use(cors(corsOptions));
-
-// Middleware to handle preflight requests for all routes
-app.options('*', cors(corsOptions));
 
 // Static files setup
 const __dirname = path.resolve();
