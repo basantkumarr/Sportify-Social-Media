@@ -1,40 +1,68 @@
 import { User } from "../models/UserSchema.js";
-import bcryptjs from "bcryptjs";
+import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 
 // Register endpoint
 export const Register = async (req, res) => {
   try {
     const { name, username, email, password } = req.body;
+
+    // Validate input
     if (!name || !username || !email || !password) {
       return res.status(400).json({
-        message: "Please fill all the fields",
+        message: "Please fill all the fields.",
         success: false,
       });
     }
 
-    const user = await User.findOne({ email });
-    if (user) {
+    // Check if user already exists
+    const existingUser = await User.findOne({ email }).exec();
+
+    if (existingUser) {
       return res.status(400).json({
-        message: "User already exists",
+        message: "User already exists.",
         success: false,
       });
     }
 
-    const hashPassword = await bcryptjs.hash(password, 16);
-    await User.create({
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 12); // Reduced salt rounds for slightly better performance
+
+    // Create new user
+    const newUser = new User({
       name,
       username,
       email,
-      password: hashPassword,
+      password: hashedPassword,
     });
 
-    return res.status(201).json({
-      message: "User created successfully",
-      success: true,
+    await newUser.save();
+
+    // Generate JWT token
+    const token = jwt.sign({ userId: newUser._id }, process.env.TOKEN_SECRET, {
+      expiresIn: "1d",
     });
-  } catch (err) {
-    console.log(err);
+
+    // Send response with cookie
+    return res
+      .status(201)
+      .cookie("token", token, {
+        expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
+        httpOnly: true,
+        sameSite: 'Strict', // Added security measure
+      })
+      .json({
+        message: "User registered successfully.",
+        user: {
+          _id: newUser._id,
+          name: newUser.name,
+          username: newUser.username,
+          email: newUser.email,
+        },
+        success: true,
+      });
+  } catch (error) {
+    console.error("Registration error:", error); // More specific error logging
     return res.status(500).json({
       message: "Server error",
       success: false,
@@ -42,10 +70,12 @@ export const Register = async (req, res) => {
   }
 };
 
-// Login endpoint
+
 export const Login = async (req, res) => {
   try {
     const { email, password } = req.body;
+
+    // Validate input
     if (!email || !password) {
       return res.status(400).json({
         message: "All fields are required.",
@@ -53,7 +83,10 @@ export const Login = async (req, res) => {
       });
     }
 
-    const user = await User.findOne({ email });
+    // Fetch user
+    const user = await User.findOne({ email }).exec();
+
+    // Check if user exists
     if (!user) {
       return res.status(401).json({
         message: "Incorrect email or password",
@@ -61,7 +94,10 @@ export const Login = async (req, res) => {
       });
     }
 
-    const isMatch = await bcryptjs.compare(password, user.password);
+    // Compare passwords
+    const isMatch = await bcrypt.compare(password, user.password);
+
+    // Validate password match
     if (!isMatch) {
       return res.status(401).json({
         message: "Incorrect email or password",
@@ -69,26 +105,31 @@ export const Login = async (req, res) => {
       });
     }
 
-    const tokenData = {
-      userId: user._id,
-    };
-    const token = jwt.sign(tokenData, process.env.TOKEN_SECRET, {
+    // Generate JWT token
+    const token = jwt.sign({ userId: user._id }, process.env.TOKEN_SECRET, {
       expiresIn: "1d",
     });
 
+    // Send response with cookie
     return res
       .status(200)
       .cookie("token", token, {
         expires: new Date(Date.now() + 24 * 60 * 60 * 1000), // 1 day
         httpOnly: true,
+        sameSite: 'Strict', // Added security measure
       })
       .json({
         message: `Welcome back ${user.name}`,
-        user,
+        user: {
+          _id: user._id,
+          name: user.name,
+          username: user.username,
+          email: user.email,
+        },
         success: true,
       });
   } catch (error) {
-    console.log(error);
+    console.error("Login error:", error); // More specific error logging
     return res.status(500).json({
       message: "Server error",
       success: false,
