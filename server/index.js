@@ -1,3 +1,4 @@
+import http from 'http';
 import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
@@ -39,8 +40,8 @@ mongoose.connect(MONGO_URI, {
   useNewUrlParser: true,
   useUnifiedTopology: true
 })
-  .then(() => console.log('MongoDB connected...'))
-  .catch(err => console.error('MongoDB connection error:', err.message));
+.then(() => console.log('MongoDB connected...'))
+.catch(err => console.error('MongoDB connection error:', err.message));
 
 // Route handlers
 app.use('/user', userRoutes);
@@ -52,9 +53,10 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Something went wrong!', details: err.message });
 });
 
-app.listen(PORT, () => {
+// Create an HTTP server and set timeout
+const server = http.createServer(app);
+server.setTimeout(60000); // Set timeout to 60 seconds
+
+server.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
 });
-
-// Setting a higher timeout for the server
-app.timeout = 60000; // 60 seconds
