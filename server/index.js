@@ -1,6 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
-import mongoose from 'ongoose';
+import mongoose from 'mongoose';
 import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import userRoutes from './Routes/userRoute.js';
@@ -16,7 +16,9 @@ app.use(cookieParser());
 // CORS Configuration
 app.use(cors({
   origin: ['https://sportify-chi.vercel.app', 'https://sportify-e09enzdaf-basants-projects-54b8f0df.vercel.app'],
-  credentials: true
+  credentials: true,
+  methods: ['GET', 'PUT', 'POST', 'DELETE', 'OPTIONS'],
+  headers: ['Content-Type', 'Authorization']
 }));
 
 // Static files setup
