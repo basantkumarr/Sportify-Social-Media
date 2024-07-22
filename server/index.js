@@ -13,14 +13,16 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 
-// Middleware to parse JSON bodies and cookies
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // Configure CORS
 const corsOptions = {
-  origin: 'https://sportify-chi.vercel.app', // Replace with your frontend origin
+  origin: [
+    'https://sportify-chi.vercel.app',
+    'https://sportify-28h3cxa27-basants-projects-54b8f0df.vercel.app'
+  ],
   credentials: true,
 };
 
