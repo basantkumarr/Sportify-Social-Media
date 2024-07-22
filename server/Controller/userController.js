@@ -41,9 +41,7 @@ export const Register = async (req, res) => {
   }
 };
 
- 
-import { User } from "../models/UserSchema.js";
-import jwt from "jsonwebtoken";
+
 
 // Login endpoint
 export const Login = async (req, res) => {
