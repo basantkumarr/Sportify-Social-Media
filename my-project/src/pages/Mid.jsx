@@ -17,7 +17,7 @@ const Mid = () => {
   useEffect(() => {
     // Fetch posts when component mounts or userId changes
     if (userId) {
-      dispatch(toggleRefresh()); // Trigger refresh if needed
+      dispatch(getRefresh()); // Trigger refresh if needed
     }
   }, [userId, dispatch]);
 
@@ -36,4 +36,3 @@ const Mid = () => {
 };
 
 export default Mid;
-
