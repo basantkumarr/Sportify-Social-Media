@@ -7,7 +7,7 @@ import useGetMyPost from '../hooks/useGetMyPost';
 const Mid = () => {
   const dispatch = useDispatch();
   const { posts } = useSelector((store) => store.post);
-  const userId = useSelector((state) => state.user.user?.id); // Adjust according to your state structure
+  const userId = useSelector((state) => state.user.user?._id); // Adjust according to your state structure
 
   console.log("Posts in Mid component:", posts); // Debugging log
 
