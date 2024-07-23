@@ -3,14 +3,16 @@ import { useSelector, useDispatch } from 'react-redux';
 import Fed from './Fed';
 import Tweet from './Tweet';
 import useGetMyPost from '../hooks/useGetMyPost';
+import { getRefresh } from '../redux/actions/postActions'; // Ensure you import the correct action
 
 const Mid = () => {
   const dispatch = useDispatch();
   const { posts } = useSelector((store) => store.post);
-  
   const userId = useSelector((state) => state.user.user?._id); // Adjust according to your state structure
-  console.log("id", userId); //
-  console.log("Posts in Mid component:", posts); // Debugging log
+
+  // Debugging logs
+  console.log("User ID in Mid component:", userId);
+  console.log("Posts in Mid component:", posts);
 
   // Use custom hook to fetch posts
   useGetMyPost(userId);
@@ -37,3 +39,4 @@ const Mid = () => {
 };
 
 export default Mid;
+
