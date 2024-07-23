@@ -1,24 +1,49 @@
-import { useSelector } from 'react-redux';
-import Fed from './Fed';
-import Tweet from './Tweet';
+import axios from 'axios';
+import { POST_API_END_POINT } from '../util/util';
+import { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllPost } from '../redux/postslice';
 
-const Mid = () => {
-  const { posts } = useSelector((store) => store.post);
+const useGetMyPost = (id) => {
+  const dispatch = useDispatch();
+  const { refresh, isActive } = useSelector((store) => store.post);
 
-  console.log("Posts in Mid component:", posts); // Debugging log
+  const fetchMyPost = async () => {
+    try {
+      const res = await axios.get(`${POST_API_END_POINT}/allposts/${id}`, {
+        withCredentials: true,
+      });
+      console.log('Response from server:', res); // Log the entire response object
+      if (res.data.success) {
+        dispatch(getAllPost(res.data.posts));
+      } else {
+        console.error('Failed to fetch posts:', res.data.message);
+      }
+    } catch (error) {
+      console.error('Error fetching posts:', error); // Log the error for debugging
+    }
+  };
 
-  return (
-    <div className='lg:w-[60%] sm:w-[100%]  border border-gray-200 h-screen overflow-y-auto custom-scrollbar'>
-      <div>
-        <Fed />
-        {posts && posts.length > 0 ? (
-          posts.map((post) => <Tweet key={post?._id} tweet={post} />)
-        ) : (
-          <p className='text-center'>No posts available...</p>
-        )}
-      </div>
-    </div>
-  );
+  const followingTweetHandler = async () => {
+    try {
+      axios.defaults.withCredentials = true;
+      const res = await axios.get(`${POST_API_END_POINT}/followingposts/${id}`);
+      console.log('Following posts response:', res); // Log the response object
+      dispatch(getAllPost(res.data.posts));
+    } catch (error) {
+      console.error('Error fetching following posts:', error); // Log the error for debugging
+    }
+  };
+
+  useEffect(() => {
+    if (id) {
+      if (isActive) {
+        fetchMyPost();
+      } else {
+        followingTweetHandler();
+      }
+    }
+  }, [isActive, refresh, id]); // Added id to dependencies to re-fetch if id changes
 };
 
-export default Mid;
+export default useGetMyPost;
